@@ -11,7 +11,6 @@
         <div class="header">
             <h1>FirstHive CDP Feature Coverage Matrix</h1>
             <p class="subtitle">Comprehensive overview of FirstHive Customer Data Platform capabilities and availability status</p>
-            
             <div class="coverage-summary">
                 <div class="summary-stat">
                     <span class="summary-number available" id="availableCount">0</span>
@@ -34,28 +33,27 @@
                     <div class="summary-label">Not Available</div>
                 </div>
             </div>
-        </div>
-
-        <div class="legend">
-            <div class="legend-item">
-                <div class="status-indicator status-available"></div>
-                <span>Available - Fully released and supported</span>
-            </div>
-            <div class="legend-item">
-                <div class="status-indicator status-beta"></div>
-                <span>Beta - Available for testing, limited support</span>
-            </div>
-            <div class="legend-item">
-                <div class="status-indicator status-roadmap"></div>
-                <span>Roadmap - Planned for future release</span>
-            </div>
-            <div class="legend-item">
-                <div class="status-indicator status-custom"></div>
-                <span>Custom - Needs custom configuration</span>
-            </div>
-            <div class="legend-item">
-                <div class="status-indicator status-na"></div>
-                <span>Not Available - Not currently planned</span>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="status-indicator status-available"></div>
+                    <span>Available - Fully released and supported</span>
+                </div>
+                <div class="legend-item">
+                    <div class="status-indicator status-beta"></div>
+                    <span>Beta - Available for testing, limited support</span>
+                </div>
+                <div class="legend-item">
+                    <div class="status-indicator status-roadmap"></div>
+                    <span>Roadmap - Planned for future release</span>
+                </div>
+                <div class="legend-item">
+                    <div class="status-indicator status-custom"></div>
+                    <span>Custom - Needs custom configuration</span>
+                </div>
+                <div class="legend-item">
+                    <div class="status-indicator status-na"></div>
+                    <span>Not Available - Not currently planned</span>
+                </div>
             </div>
         </div>
 
@@ -118,14 +116,16 @@
                 <div class="category-header" onclick="toggleCategory(this)">
                     <div>
                         <div class="category-title">${categoryName}</div>
-                        <div class="category-stats">
-                            <span style="color: #27ae60;">${stats.available} Available</span>
-                            <span style="color: #f39c12;">${stats.beta} Beta</span>
-                            <span style="color: #3498db;">${stats.roadmap} Roadmap</span>
-                            <span style="color: #d3d3d3;">${stats.custom} Custom Config</span>
-                        </div>
                     </div>
-                    <div class="toggle-icon">▼</div>
+                    <div class="category-stats">
+                        <span class="available" title="Available">${stats.available}</span>
+                        <span class="beta" title="Beta">${stats.beta}</span>
+                        <span class="roadmap" title="Roadmap">${stats.roadmap}</span>
+                        <span class="custom" title="Custom Config">${stats.custom}</span>
+                    </div>
+                    <span class="toggle-icon" aria-hidden="true" style="display:block;transform:rotate(90deg);">
+                        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="7,5 15,11 7,17" stroke="#8b8fa7" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
                 </div>
                 <div class="category-content expanded">
                     <div class="features-grid">
@@ -171,9 +171,9 @@
         function toggleCategory(header) {
             const content = header.nextElementSibling;
             const icon = header.querySelector('.toggle-icon');
-            
             content.classList.toggle('expanded');
-            icon.style.transform = content.classList.contains('expanded') ? 'rotate(0deg)' : 'rotate(-90deg)';
+            icon.style.transform = content.classList.contains('expanded') ? 'rotate(90deg)' : 'rotate(0deg)';
+            icon.style.transition = 'transform 0.18s';
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -209,6 +209,16 @@
                     card.style.display = 'none';
                 }
             });
+            
+            // Show/hide accordions based on visible feature-cards
+            document.querySelectorAll('.category-section').forEach(section => {
+                const visibleCards = section.querySelectorAll('.feature-card:not([style*="display: none"])');
+                if (visibleCards.length > 0 || status === 'all') {
+                    section.style.display = '';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
         }
 
         function searchFeatures(term) {
@@ -218,6 +228,15 @@
                     card.style.display = 'block';
                 } else {
                     card.style.display = 'none';
+                }
+            });
+            // Show/hide accordions based on visible feature-cards
+            document.querySelectorAll('.category-section').forEach(section => {
+                const visibleCards = section.querySelectorAll('.feature-card:not([style*="display: none"])');
+                if (visibleCards.length > 0 || term === '') {
+                    section.style.display = '';
+                } else {
+                    section.style.display = 'none';
                 }
             });
         }
