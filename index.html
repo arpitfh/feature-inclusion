@@ -3,78 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FirstHive CDP Feature Coverage Matrix</title>
+    <title>FirstHive | Feature Coverage</title>
+    <meta name="title" content="FirstHive | Feature Coverage">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>FirstHive CDP Feature Coverage Matrix</h1>
-            <p class="subtitle">Comprehensive overview of FirstHive Customer Data Platform capabilities and availability status</p>
-            <div class="coverage-summary">
-                <div class="summary-stat">
-                    <span class="summary-number available" id="availableCount">0</span>
-                    <div class="summary-label">Available</div>
-                </div>
-                <div class="summary-stat">
-                    <span class="summary-number beta" id="betaCount">0</span>
-                    <div class="summary-label">Beta</div>
-                </div>
-                <div class="summary-stat">
-                    <span class="summary-number roadmap" id="roadmapCount">0</span>
-                    <div class="summary-label">Roadmap</div>
-                </div>
-                <div class="summary-stat">
-                    <span class="summary-number roadmap" id="customCount">0</span>
-                    <div class="summary-label">Custom Config</div>
-                </div>
-                <div class="summary-stat">
-                    <span class="summary-number na" id="naCount">0</span>
-                    <div class="summary-label">Not Available</div>
-                </div>
+    <header class="site-header">
+        <div class="header-content">
+            <div class="logo">
+                <img src="https://blog.firsthive.com/wp-content/uploads/Firsthive-Logo-Image.png" alt="FirstHive" class="logo-img">
             </div>
-            <div class="legend">
-                <div class="legend-item">
-                    <div class="status-indicator status-available"></div>
-                    <span>Available - Fully released and supported</span>
-                </div>
-                <div class="legend-item">
-                    <div class="status-indicator status-beta"></div>
-                    <span>Beta - Available for testing, limited support</span>
-                </div>
-                <div class="legend-item">
-                    <div class="status-indicator status-roadmap"></div>
-                    <span>Roadmap - Planned for future release</span>
-                </div>
-                <div class="legend-item">
-                    <div class="status-indicator status-custom"></div>
-                    <span>Custom - Needs custom configuration</span>
-                </div>
-                <div class="legend-item">
-                    <div class="status-indicator status-na"></div>
-                    <span>Not Available - Not currently planned</span>
-                </div>
-            </div>
+            <nav class="main-nav">
+                <a href="#" class="nav-link">Home</a>
+                <a href="#" class="nav-link">Features</a>
+                <a href="#" class="nav-link">Documentation</a>
+                <a href="#" class="nav-link">Support</a>
+            </nav>
         </div>
+    </header>
 
-        <div class="search-filter">
-            <div class="filter-controls">
-                <input type="text" class="search-input" placeholder="Search features..." id="searchInput">
-                <div class="filter-buttons">
-                    <button class="filter-btn active" data-filter="all">All</button>
-                    <button class="filter-btn" data-filter="available">Available</button>
-                    <button class="filter-btn" data-filter="beta">Beta</button>
-                    <button class="filter-btn" data-filter="roadmap">Roadmap</button>
-                    <button class="filter-btn" data-filter="custom">Custom Config</button>
-                    <button class="filter-btn" data-filter="na">Not Available</button>
+    <main class="main-content">
+        <div class="container">
+            <div class="header">
+                <h1>Feature Coverage</h1>
+                <p class="subtitle">Comprehensive overview of FirstHive Customer Data Platform capabilities and availability status</p>
+                <div class="coverage-summary">
+                    <div class="summary-stat">
+                        <span class="summary-number available" id="availableCount">0</span>
+                        <div class="summary-label">Available</div>
+                    </div>
+                    <div class="summary-stat">
+                        <span class="summary-number beta" id="betaCount">0</span>
+                        <div class="summary-label">Beta</div>
+                    </div>
+                    <div class="summary-stat">
+                        <span class="summary-number roadmap" id="roadmapCount">0</span>
+                        <div class="summary-label">Roadmap</div>
+                    </div>
+                    <div class="summary-stat">
+                        <span class="summary-number roadmap" id="customCount">0</span>
+                        <div class="summary-label">Custom Config</div>
+                    </div>
+                    <div class="summary-stat">
+                        <span class="summary-number na" id="naCount">0</span>
+                        <div class="summary-label">Not Available</div>
+                    </div>
+                </div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="status-indicator status-available"></div>
+                        <span>Available - Fully released and supported</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="status-indicator status-beta"></div>
+                        <span>Beta - Available for testing, limited support</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="status-indicator status-roadmap"></div>
+                        <span>Roadmap - Planned for future release</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="status-indicator status-custom"></div>
+                        <span>Custom - Needs custom configuration</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="status-indicator status-na"></div>
+                        <span>Not Available - Not currently planned</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="feature-categories" id="categoriesContainer">
-            <!-- Categories will be populated by JavaScript -->
+            <div class="search-filter">
+                <div class="filter-controls">
+                    <input type="text" class="search-input" placeholder="Search features..." id="searchInput">
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="available">Available</button>
+                        <button class="filter-btn" data-filter="beta">Beta</button>
+                        <button class="filter-btn" data-filter="roadmap">Roadmap</button>
+                        <button class="filter-btn" data-filter="custom">Custom Config</button>
+                        <button class="filter-btn" data-filter="na">Not Available</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-categories" id="categoriesContainer">
+                <!-- Categories will be populated by JavaScript -->
+            </div>
         </div>
-    </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>FirstHive CDP</h4>
+                <p>Customer Data Platform for modern businesses</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">API Reference</a></li>
+                    <li><a href="#">Support</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Case Studies</a></li>
+                    <li><a href="#">Webinars</a></li>
+                    <li><a href="#">Community</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 FirstHive. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script>
         function initializeMatrix(featureData) {
