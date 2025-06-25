@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FirstHive CDP Feature Coverage Matrix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            margin-bottom: 1.5rem;
+        }
+
+        .coverage-summary {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .summary-stat {
+            text-align: center;
+        }
+
+        .summary-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 0.25rem;
+        }
+
+        .available { color: #27ae60; }
+        .beta { color: #f39c12; }
+        .roadmap { color: #3498db; }
+        .custom { color: #274bae; }
+        .na { color: #95a5a6; }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 25px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            font-weight: 500;
+        }
+
+        .status-indicator {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-available { background: #27ae60; }
+        .status-beta { background: #f39c12; }
+        .status-roadmap { background: #3498db; }
+        .status-custom { background: #274bae; }
+        .status-na { background: #95a5a6; }
+
+        .feature-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .category-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .category-header:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+
+        .category-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .category-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .toggle-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .category-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .category-content.expanded {
+            max-height: 2000px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1rem;
+            padding: 2rem;
+        }
+
+        .feature-card {
+            border: 2px solid #ecf0f1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: #fafbfc;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-card.available {
+            border-color: #27ae60;
+            background: linear-gradient(135deg, #d5f4e6 0%, #fafbfc 100%);
+        }
+
+        .feature-card.beta {
+            border-color: #f39c12;
+            background: linear-gradient(135deg, #fef5e7 0%, #fafbfc 100%);
+        }
+
+        .feature-card.roadmap {
+            border-color: #3498db;
+            background: linear-gradient(135deg, #ebf3fd 0%, #fafbfc 100%);
+        }
+
+        .feature-card.na {
+            border-color: #bdc3c7;
+            background: #f8f9fa;
+            opacity: 0.7;
+        }
+
+        .feature-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .feature-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            flex: 1;
+        }
+
+        .feature-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: 1rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-available {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+
+        .badge-beta {
+            background: #fef5e7;
+            color: #f39c12;
+        }
+
+        .badge-roadmap {
+            background: #ebf3fd;
+            color: #3498db;
+        }
+
+        .badge-na {
+            background: #ecf0f1;
+            color: #95a5a6;
+        }
+
+        .feature-description {
+            color: #7f8c8d;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .feature-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .feature-capabilities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .capability-tag {
+            background: #ecf0f1;
+            color: #7f8c8d;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .release-info {
+            font-size: 0.8rem;
+            color: #95a5a6;
+            font-style: italic;
+        }
+
+        .search-filter {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 0.75rem;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #ecf0f1;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .coverage-summary {
+                gap: 1rem;
+            }
+            
+            .legend {
+                gap: 1rem;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>FirstHive CDP Feature Coverage Matrix</h1>
+            <p class="subtitle">Comprehensive overview of FirstHive Customer Data Platform capabilities and availability status</p>
+            
+            <div class="coverage-summary">
+                <div class="summary-stat">
+                    <span class="summary-number available" id="availableCount">0</span>
+                    <div class="summary-label">Available</div>
+                </div>
+                <div class="summary-stat">
+                    <span class="summary-number beta" id="betaCount">0</span>
+                    <div class="summary-label">Beta</div>
+                </div>
+                <div class="summary-stat">
+                    <span class="summary-number roadmap" id="roadmapCount">0</span>
+                    <div class="summary-label">Roadmap</div>
+                </div>
+                <div class="summary-stat">
+                    <span class="summary-number roadmap" id="customCount">0</span>
+                    <div class="summary-label">Custom Config</div>
+                </div>
+                <div class="summary-stat">
+                    <span class="summary-number na" id="naCount">0</span>
+                    <div class="summary-label">Not Available</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="status-indicator status-available"></div>
+                <span>Available - Fully released and supported</span>
+            </div>
+            <div class="legend-item">
+                <div class="status-indicator status-beta"></div>
+                <span>Beta - Available for testing, limited support</span>
+            </div>
+            <div class="legend-item">
+                <div class="status-indicator status-roadmap"></div>
+                <span>Roadmap - Planned for future release</span>
+            </div>
+            <div class="legend-item">
+                <div class="status-indicator status-custom"></div>
+                <span>Custom - Needs custom configuration</span>
+            </div>
+            <div class="legend-item">
+                <div class="status-indicator status-na"></div>
+                <span>Not Available - Not currently planned</span>
+            </div>
+        </div>
+
+        <div class="search-filter">
+            <div class="filter-controls">
+                <input type="text" class="search-input" placeholder="Search features..." id="searchInput">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="available">Available</button>
+                    <button class="filter-btn" data-filter="beta">Beta</button>
+                    <button class="filter-btn" data-filter="roadmap">Roadmap</button>
+                    <button class="filter-btn" data-filter="custom">Custom Config</button>
+                    <button class="filter-btn" data-filter="na">Not Available</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-categories" id="categoriesContainer">
+            <!-- Categories will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const featureData = {
+            "Data Ingestion & Collection": [
+                {
+                    name: "Real-time Streaming APIs",
+                    status: "available",
+                    description: "High-throughput streaming data ingestion with sub-second latency and auto-scaling capabilities.",
+                    capabilities: ["REST APIs", "Webhooks", "SDK Support"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Batch Data Processing",
+                    status: "available",
+                    description: "Scheduled and on-demand batch processing with support for large file formats and data validation.",
+                    capabilities: ["CSV", "JSON", "Parquet", "Avro", "XML"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Landing Page Generator",
+                    status: "available",
+                    description: "Create a basic landing page to collect customer data.",
+                    capabilities: ["landing page","data collation"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Meta lead form ads",
+                    status: "config",
+                    description: "Collate leads from Facebook ads lead form directly in FirstHive.",
+                    capabilities: ["landing page","data collation"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Shopify connector",
+                    status: "available",
+                    description: "Ingest orders, customers, and product information from Shopify store.",
+                    capabilities: ["Shopify","ecom","PoS","data collation"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Pre-built Source Connectors",
+                    status: "available",
+                    description: "150+ pre-built connectors for popular data sources including CRMs, marketing platforms, and databases. 700+ through partners.",
+                    capabilities: ["Salesforce", "Zoho", "Google Analytics", "Facebook","Google","Criteo","Appsflyer","Klaviyo"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Change Data Capture (CDC)",
+                    status: "available",
+                    description: "Real-time capture of database changes for immediate data synchronization and processing.",
+                    capabilities: ["MySQL", "PostgreSQL", "SQL Server"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Mobile SDK",
+                    status: "available",
+                    description: "Lightweight data collection for mobile behavioral and activity/ events data.",
+                    capabilities: ["Kotlin","Swift","ReactNative","Xamarin","native Android","native iOS"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Web SDK",
+                    status: "available",
+                    description: "Lightweight data collection for web behavioral and activity/ events data.",
+                    capabilities: ["Javascript","PHP","C#","React","Angular","Wordpress","Drupal","Joomla","Google Tag Manager","Adobe Analytics"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Tag Manager",
+                    status: "available",
+                    description: "Tag Manager capable of triggering multiple tags and setting logics for events capture and web elements management.",
+                    capabilities: ["FH Tag Manager","async tags","Google Tag Manager","Adobe Analytics"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Server Side Integration",
+                    status: "custom",
+                    description: "Involves sending customer data from a server environment to the CDP, rather than relying solely on client-side (e.g., browser-based) trackingLightweight data collection for web behavioral and activity/ events data.",
+                    capabilities: ["Google Ads Conversion","Meta Conversion","ESPs","SSPs"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Unstructured Data",
+                    status: "available",
+                    description: "Unstructured data processing from voice, text, image, video sources.",
+                    capabilities: ["Voice","Video","Text","Image"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Custom Connectors",
+                    status: "available",
+                    description: "Custom integrations with any source or destination system",
+                    capabilities: ["REST APIs","SOAP APIs","Batch Processing"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Edge Data Collection",
+                    status: "Roadmap",
+                    description: "Lightweight data collection at edge locations for reduced latency and improved performance.",
+                    capabilities: ["IoT Devices", "Edge Servers","Beacons"],
+                    releaseInfo: "Roadmap"
+                },
+                {
+                    name: "Mainframe Integration",
+                    status: "na",
+                    description: "Direct integration with legacy mainframe systems and COBOL applications.",
+                    capabilities: ["COBOL", "JCL", "VSAM"],
+                    releaseInfo: "Not Planned"
+                }
+            ],
+            "Identity Resolution & Profile Management": [
+                {
+                    name: "Deterministic Identity Matching",
+                    status: "available",
+                    description: "Exact matching across known identifiers like email, phone, and customer IDs with 99.9% accuracy.",
+                    capabilities: ["Email", "Phone", "Customer ID", "Device ID"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Probabilistic Identity Matching",
+                    status: "available",
+                    description: "ML-powered fuzzy matching for incomplete or varying data with configurable confidence thresholds.",
+                    capabilities: ["Name Matching", "Address Matching", "Behavioral Patterns"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Real-time Profile Updates",
+                    status: "available",
+                    description: "Instant profile updates as new data arrives with conflict resolution and merge rules.",
+                    capabilities: ["Streaming Updates", "Conflict Resolution", "Audit Trail"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Cross-Device Identity Graph",
+                    status: "available",
+                    description: "Advanced cross-device tracking and identity resolution using machine learning algorithms.",
+                    capabilities: ["Device Fingerprinting", "Behavioral Analysis", "Graph Database"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "B2B Account Hierarchy",
+                    status: "roadmap",
+                    description: "Complex B2B account relationships and organizational hierarchy mapping.",
+                    capabilities: ["Parent-Child Accounts", "Subsidiary Mapping", "Contact Roles"],
+                    releaseInfo: "Roadmap"
+                },
+                {
+                    name: "Biometric Identity Matching",
+                    status: "custom",
+                    description: "Identity resolution using biometric data like fingerprints or facial recognition.",
+                    capabilities: ["Fingerprint", "Facial Recognition", "Voice Print"],
+                    releaseInfo: "Custom Config"
+                }
+            ],
+            "Data Processing & Transformation": [
+                {
+                    name: "Visual Data Pipeline Builder",
+                    status: "roadmap",
+                    description: "Drag-and-drop interface for building complex data transformation pipelines without coding.",
+                    capabilities: ["Visual Interface", "Pre-built Functions", "Custom Logic"],
+                    releaseInfo: "Roadmap"
+                },
+                {
+                    name: "Snowflake Data Sharing",
+                    status: "available",
+                    description: "Enable Data Sharing between FirstHive CDP and client Snowflake.",
+                    capabilities: ["Snowflake", "Raw Data Access"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Data tagging",
+                    status: "available",
+                    description: "Enable Data tags/ labels to add a natural language context on the data.",
+                    capabilities: ["data tags","data labels","source tagging"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Social tags",
+                    status: "available",
+                    description: "Enable tagson social posts to tag/ label customers who interact with said posts.",
+                    capabilities: ["data tags","data labels","social post tagging"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Raw Data Access",
+                    status: "available",
+                    description: "Enable raw data access for client analytics users via replica RDS, S3, Snowflake access.",
+                    capabilities: ["Snowflake", "Raw Data Access","RDS","S3","Blob"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "ML Canvas",
+                    status: "beta",
+                    description: "Enable raw data access via embedded Jupytr within FirstHive.",
+                    capabilities: ["S3", "Jupytr"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "DIY Integration Workflow Builder",
+                    status: "roadmap",
+                    description: "Drag-and-drop interface for building complex integrations from various sources without coding.",
+                    capabilities: ["Visual Interface", "Pre-built Functions", "Custom Logic"],
+                    releaseInfo: "Roadmap"
+                },
+                {
+                    name: "Real-time Data Transformation",
+                    status: "custom",
+                    description: "Stream processing for real-time data transformation and enrichment with low latency.",
+                    capabilities: ["Field Mapping", "Data Cleansing", "Format Conversion"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Data Quality Monitoring",
+                    status: "custom",
+                    description: "Automated data quality checks with alerts and remediation workflows.",
+                    capabilities: ["Quality Scores", "Anomaly Detection", "Auto-Correction"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "ML-powered Data Enrichment",
+                    status: "beta",
+                    description: "Machine learning models for automatic data enhancement and missing value prediction.",
+                    capabilities: ["Value Prediction", "Category Classification", "Sentiment Analysis"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "3rd party Data Enrichment",
+                    status: "custom",
+                    description: "Integration with 3rd party sources for data enrichment.",
+                    capabilities: ["Behavioral","Data Enrichment"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Data Clean Room Integration",
+                    status: "custom",
+                    description: "Integration with data clean rooms for attribution/ analysis.",
+                    capabilities: ["AWS DCR","Snowflake DCR","Aqiliz DCR"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Advanced Computed Attributes",
+                    status: "beta",
+                    description: "Complex calculated fields and derived attributes using advanced mathematical functions.",
+                    capabilities: ["Statistical Functions", "Time-series Analysis", "Predictive Scoring"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "Quantum Data Processing",
+                    status: "na",
+                    description: "Quantum computing-powered data processing for complex calculations.",
+                    capabilities: ["Quantum Algorithms", "Superposition", "Entanglement"],
+                    releaseInfo: "Not Planned"
+                }
+            ],
+            "AI Agents": [
+                {
+                    name: "Eddie",
+                    status: "beta",
+                    description: "Eddie is the FH Master Agent framework that mediates between the underlying agents.",
+                    capabilities: ["FH Copilot", "Chatbot", "Agentic UI"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "Translation Agent",
+                    status: "beta",
+                    description: "Translation across multiple languages.",
+                    capabilities: ["FH Copilot", "Chatbot", "Agentic UI"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "Document Processing",
+                    status: "beta",
+                    description: "Process JSON output from invoice images.",
+                    capabilities: ["FH Copilot", "Chatbot", "Agentic UI","JSON","Invoice Processing"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "Knowledgebase Agent",
+                    status: "beta",
+                    description: "Knowledgebase query via a natural language interface.",
+                    capabilities: ["FH Copilot", "Chatbot", "Agentic UI"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "Analytics Agent",
+                    status: "beta",
+                    description: "Pull underlying analytics via a agentic chatbot.",
+                    capabilities: ["FH Copilot", "Chatbot", "Agentic UI"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "Segment Creation Agent",
+                    status: "beta",
+                    description: "Create segments in FirstHive via a conversational interface.",
+                    capabilities: ["FH Copilot", "Chatbot", "Agentic UI"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "Content Creation",
+                    status: "beta",
+                    description: "Generate content across Email, SMS, Whatsapp, RCS, et al for optimizing your customer conversions.",
+                    capabilities: ["FH Copilot", "Chatbot", "Agentic UI"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "Subject Optimization Agent",
+                    status: "beta",
+                    description: "Generate or optimize subject lines basis a prompt UI.",
+                    capabilities: ["FH Copilot", "Chatbot", "Agentic UI"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "Small Language Agent",
+                    status: "custom",
+                    description: "Train Eddie on your data for conversational insights",
+                    capabilities: ["RAG","Vector DB","Self hosted LLM"],
+                    releaseInfo: "Custom Config"
+                }
+            ],
+            "ML Models": [
+                {
+                    name: "CLTV",
+                    status: "beta",
+                    description: "Predictive Customer Lifetime Value.",
+                    capabilities: ["CLTV","Predictive"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "Propensity",
+                    status: "beta",
+                    description: "Behavior modelling/ prediction.",
+                    capabilities: ["Propensity scoring"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "Predictive Recommendations",
+                    status: "available",
+                    description: "Predictive Recommendations for affinity to campaign channel, time, and content.",
+                    capabilities: ["Predictive","Choice of Channel","Ideal Time of nudge","Content affinity"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Look-alike Segmentation",
+                    status: "available",
+                    description: "Knowledgebase query via a natural language interface.",
+                    capabilities: ["FH Copilot", "Chatbot", "Agentic UI"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Predictive Segmentation",
+                    status: "available",
+                    description: "Pull underlying analytics via a agentic chatbot.",
+                    capabilities: ["FH Copilot", "Chatbot", "Agentic UI"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Basket Analysis",
+                    status: "beta",
+                    description: "Basket Analysis to determine propensity to purchase another product/ SKU",
+                    capabilities: ["basket analysis","cross-sell","upsell"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "Churn Prediction",
+                    status: "beta",
+                    description: "Churn Prediction.",
+                    capabilities: ["customer churn"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "Next Best Action",
+                    status: "beta",
+                    description: "Next Best Action/ Offer recommendation.",
+                    capabilities: ["NBA","NBO"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "RFM Cohort",
+                    status: "beta",
+                    description: "Train Eddie on your data for conversational insights",
+                    capabilities: ["RFM","customer cohorts"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "Retention cohorts",
+                    status: "beta",
+                    description: "Retention Cohorts modeling for data analysis",
+                    capabilities: ["consistent","inconsistent","Retention cohorts"],
+                    releaseInfo: "Beta - Early Access"
+                },
+                {
+                    name: "EDA",
+                    status: "beta",
+                    description: "Exploratory Data Analysis across a pre-trained set of vectors",
+                    capabilities: ["EDA"],
+                    releaseInfo: "Beta - Early Access"
+                }
+            ],
+            "Platform Governance": [
+                {
+                    name: "MFA",
+                    status: "available",
+                    description: "Multi-Factor Authentication.",
+                    capabilities: ["MFA"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "IDP Integration",
+                    status: "available",
+                    description: "Single Sign On Integration with client Identity Provider.",
+                    capabilities: ["Okta","Active Directory","SAML 2.0"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "ISMS ISO 27001 controls",
+                    status: "available",
+                    description: "ISMS ISO 27001 controls.",
+                    capabilities: ["ISO 27001"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "ISMS ISO 27018 controls",
+                    status: "available",
+                    description: "ISMS ISO 27018 controls.",
+                    capabilities: ["ISO 27018","PII"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "SOC 2 Type II compliance",
+                    status: "available",
+                    description: "SOC 2 Type II compliance.",
+                    capabilities: ["SOC 2"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "RBAC",
+                    status: "available",
+                    description: "Role Based Access Control to manage User and Role Management.",
+                    capabilities: ["user mgmt","role mgmt","RBAC"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Consent Management",
+                    status: "available",
+                    description: "Consent Management for communication channels. Can be configured on a brand X channel framework",
+                    capabilities: ["consent","preference"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Preference Management",
+                    status: "custom",
+                    description: "Preference Management to accept consent and set communication preference flags",
+                    capabilities: ["consent","preference"],
+                    releaseInfo: "Custom config"
+                },
+                {
+                    name: "Audit/ Activity Logs",
+                    status: "available",
+                    description: "Churn Prediction.",
+                    capabilities: ["customer churn"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Maker/ Checker roles",
+                    status: "available",
+                    description: "Maker - Checker roles for campaign design and execution.",
+                    capabilities: ["campaign","maker","checker","approval"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Segment Archival",
+                    status: "available",
+                    description: "Ability to archive or unarchive unused or inactive segments.",
+                    capabilities: ["data mgmt","segmentation","archival rules"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Data Retention Policy",
+                    status: "available",
+                    description: "Retention Policy compliance as a data processor, in compliance with the Data Processing Agreement.",
+                    capabilities: ["GDPR","data retention","archival","purge","DPA"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Forget Me Policy compliance",
+                    status: "available",
+                    description: "Compliance with Data Subject rights under GDPR/ CCPA/ DPDP.",
+                    capabilities: ["consent","GDPR","PII","DSAR","forget me"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Data Subject Access Request compliance",
+                    status: "config",
+                    description: "Compliance with Data Subject access rights under GDPR/ CCPA/ DPDP.",
+                    capabilities: ["consent","GDPR","PII","DSAR"],
+                    releaseInfo: "Custom Config"
+                }
+                
+            ],
+            "Activation": [
+                {
+                    name: "Rule based segmentation",
+                    status: "available",
+                    description: "Rule based segmentation across database attributes, events, intelligent attributes, and tags.",
+                    capabilities: ["segmentation","cohorts"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Email Campaign",
+                    status: "available",
+                    description: "Ability to create and execute personalized email campaigns.",
+                    capabilities: ["Email","Personalization"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "ESP Integrations",
+                    status: "available",
+                    description: "OOTB integrations with multiple Email Sending Providers.",
+                    capabilities: ["Twilio","SendGrid","Mandrill","AWS SES","Sinch","Netcore","JioCX"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "AMP Email",
+                    status: "custom",
+                    description: "Ability to send AMP (Accelerated Mobile Page) Email Template.",
+                    capabilities: ["AMP","Email"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "SMS Campaign",
+                    status: "available",
+                    description: "Ability to create and execute personalized SMS campaigns.",
+                    capabilities: ["SMS","Text Messaging"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "SSP Integrations",
+                    status: "available",
+                    description: "OOTB integrations with multiple SMS Sending Providers.",
+                    capabilities: ["Twilio","Plivo","ValueFirst","Sinch","Kaleyra","Karix","JioCX","Infobip","Wizcom","Netcore","Gupshup"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Whatsapp Campaign",
+                    status: "available",
+                    description: "Ability to create and execute personalized Whatsapp campaigns.",
+                    capabilities: ["Whatsapp"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Whatsapp Integrations",
+                    status: "available",
+                    description: "OOTB integrations with multiple Whatsapp Aggregators.",
+                    capabilities: ["Netcore","Gupshup","Sinch","ValueFirst","Haptik","Text","Rich/ Media Card","Carousel","Interactive Buttons (CTAs & Quick Reply)"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "RCS campaign",
+                    status: "available",
+                    description: "Ability to create and execute personalized RCS campaigns.",
+                    capabilities: ["RCS","Google","Plain Text","Rich Card","Carousel"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Mobile Push Notifications",
+                    status: "available",
+                    description: "Ability to create and execute personalized Mobile Push campaigns.",
+                    capabilities: ["mobile push","notifications","FCM"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Voice Campaign",
+                    status: "custom",
+                    description: "Ability to create and execute outbound IVR based voice campaigns",
+                    capabilities: ["voice campaign","automated IVR","text to speech"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Voice Campaign Integrations",
+                    status: "available",
+                    description: "OOTB integrations with multiple Voice and IVR campaign Aggregators.",
+                    capabilities: ["Twilio","Ozonetel","Gupshup (Knowlarity)"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "MAPI campaign",
+                    status: "available",
+                    description: "Integration with Meta Marketing API for pushing Whatsapp marketing messages via the Meta Ads UI",
+                    capabilities: ["Meta","WhatsApp","MAPI"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "In app Notifications",
+                    status: "custom",
+                    description: "Configuration of in-app messages via campaign channels",
+                    capabilities: ["notifications","in-app","mobile"],
+                    releaseInfo: "Custom config"
+                },
+                {
+                    name: "Web/ Browser Push",
+                    status: "available",
+                    description: "Ability to create and execute web push campaigns targeted basis visitor user agent led targeting options",
+                    capabilities: ["web push","browser push","FCM","Text","Banner"],
+                    releaseInfo: "Generally Availanle"
+                },
+                {
+                    name: "On-Site notifications",
+                    status: "custom",
+                    description: "Ability to configure and execute on site notifications campaigns to personalize visitor engagement with web property.",
+                    capabilities: ["Javascript","Service Worker","Tag Manager","On Site notifications","Web Personalization","Banner","exit intent","popup","modal","classic"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Audience Bridge - PII based",
+                    status: "available",
+                    description: "Ability to push PII based audience cohorts to destinations.",
+                    capabilities: ["Meta Ads","Google Ads","S3","Blob","MFT","SFTP","Klaviyo","Criteo","Custom Audience","Facebook"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Audience Bridge - Non PII",
+                    status: "available",
+                    description: "Ability to push non-PII based behavioral audience cohorts to destinations.",
+                    capabilities: ["Audience Push","Audience Sync","Meta ads","Custom Audience","Facebook"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Meta Subscriber Sync",
+                    status: "available",
+                    description: "Sync of Whatsapp consent backed subscriber cohort with Meta for targeting.",
+                    capabilities: ["Meta","Whatsapp","consent"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Meta Conversion sync",
+                    status: "available",
+                    description: "Ability to sync conversion data with Meta for Ads optimization and attribution.",
+                    capabilities: ["CAPI","Conversion API","Meta pixel","Server side integration","Facebook"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Journey Automation",
+                    status: "available",
+                    description: "Ability to configure automated campaign journeys via a no code UI.",
+                    capabilities: ["Campaign Journey","Automation","Conditional flow","Click based UI"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "A/B campaigns",
+                    status: "available",
+                    description: "Ability to execute A/B campaign to optimize conversions.",
+                    capabilities: ["Email","SMS","Whatsapp"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Campaign Scheduler",
+                    status: "available",
+                    description: "Ability to schedule campaigns basis a particular time or frequency.",
+                    capabilities: ["one-time","recurring","Email","SMS","WhatsApp","RCS","Mobile Push","Web Push"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Journey Scheduler",
+                    status: "available",
+                    description: "Ability to schedule journeys basis a particular time or frequency.",
+                    capabilities: ["one-time","recurring"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Audience Bridge Scheduler",
+                    status: "roadmap",
+                    description: "Ability to schedule Audience sync with any destination at a pre configured frequency.",
+                    capabilities: ["scheduler","Audience bridge"],
+                    releaseInfo: "Roadmap"
+                },
+                {
+                    name: "Social Post Scheduler",
+                    status: "available",
+                    description: "Ability to schedule social posts.",
+                    capabilities: ["Facebook","Facebook Business Manager","X","Twitter"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Real-time Campaign",
+                    status: "config",
+                    description: "Ability to create and execute real-time campaigns/ journeys.",
+                    capabilities: ["event trigger","CWYL","Continue Where you Left","Abandon cart"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Exclusion list management",
+                    status: "available",
+                    description: "Ability to add email Ids or mobile numbers to exclusion lists for ensuring filtering from campaigns.",
+                    capabilities: ["exclusion management","Email","Mobile","RCS","WhatsApp"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Domain Exclusion",
+                    status: "available",
+                    description: "Ability to add specific domains to exclusion criteria to filter all recepients on the said domain from email campaigns.",
+                    capabilities: ["domain level exclusion","B2B"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Honeypot tracking",
+                    status: "available",
+                    description: "Default addition of a honeypot URL to email campaigns to filter out bots engagement.",
+                    capabilities: ["bots","honeypot","click tracking"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Phased Delivery",
+                    status: "custom",
+                    description: "Ability to stagger campaign delivery over a few hours.",
+                    capabilities: ["staggered delivery","phased delivery","Email","SMS"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Blackout period",
+                    status: "custom",
+                    description: "Ability to queue or suppress campaigns that are triggered during a DND or blackout period.",
+                    capabilities: ["DND hours","Blackout"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Short URL",
+                    status: "available",
+                    description: "Short URL creation for tracking clicks at an individual recepient level.",
+                    capabilities: ["custom tracking","Short URL","SMS"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Vanity URL",
+                    status: "available",
+                    description: "Short brand specific URL creation for tracking clicks at an individual recepient level.",
+                    capabilities: ["custom tracking","brand short URL","SMS"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Deep Linking",
+                    status: "na",
+                    description: "Deep link creation and management across channels.",
+                    capabilities: [""],
+                    releaseInfo: "Not Planned"
+                },
+                {
+                    name: "Deferred Deep Linking",
+                    status: "na",
+                    description: "Deep linking with memory function.",
+                    capabilities: [""],
+                    releaseInfo: "Not Planned"
+                },
+                {
+                    name: "Publication List",
+                    status: "custom",
+                    description: "Curated sets of contacts used to control who receives specific campaigns or communications.",
+                    capabilities: ["opt-in","publication lists","public lists","private lists","Email"],
+                    releaseInfo: "Custom config"
+                },
+                {
+                    name: "Send to Unique",
+                    status: "available",
+                    description: "Ability to ensure that a single message is delivered to a contact vector in a campaign.",
+                    capabilities: ["Email","SMS","WhatsApp","RCS","Mobile Push","Web Push"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Ignore Master Unsubscription",
+                    status: "available",
+                    description: "Ability to ignore the unsubscription list and send out communication, typically regulatory.",
+                    capabilities: ["Email","SMS"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Add CC/ BCC to emails",
+                    status: "available",
+                    description: "Ability to copy or blind copy a specific or personalized email for email campaigns executed.",
+                    capabilities: ["CC","BCC","Email campaigns"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "UTM CTA link tagging",
+                    status: "available",
+                    description: "Call to Acttion Link UTM tagging for attribution.",
+                    capabilities: ["UTM tagging","Attribution","Campaign Name","Medium","Source","Keyword","Key Value Pair","Email","SMS","Mobile Push"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Template Management",
+                    status: "available",
+                    description: "Template Management capabilities to drive reuse of brand templates.",
+                    capabilities: ["Email"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Preview & Test",
+                    status: "available",
+                    description: "Ability to preview amd test a campaign prior to execution",
+                    capabilities: ["Email","SMS","WhatsApp","RCS","Mobile Push"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Personalization",
+                    status: "available",
+                    description: "Database attributes based content personalization.",
+                    capabilities: ["content personalization","DB attributes","Email","SMS","WhatsApp","RCS","Mobile Push"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Advanced Personalization",
+                    status: "available",
+                    description: "Personalization of content blocks basis a recepient specific vector.",
+                    capabilities: ["Email","SMS","WhatsApp"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Touch Frequency Threshold",
+                    status: "available",
+                    description: "Ability to set a Frequency Cap for communication received via a Sender Id to a contact vector.",
+                    capabilities: ["Email","SMS","WhatsApp","Daily","Monthly"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Test & Control",
+                    status: "available",
+                    description: "Ability to set a control group against a journey for lift measurement.",
+                    capabilities: ["Journeys","Control group","Campaign Lift","Coversions","Direct attribution","Indirect attribution"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Conversion Attribution",
+                    status: "available",
+                    description: "Ability to attribute conversions against a journey",
+                    capabilities: ["Journeys","Campaign Lift","Coversions","Direct attribution","Indirect attribution"],
+                    releaseInfo: "Generally Available"
+                }
+
+
+                
+            ],
+            "Analytics & Reports": [
+                {
+                    name: "Campaign Analytics Report",
+                    status: "available",
+                    description: "Reporting on campaign analytics and performance.",
+                    capabilities: ["Email","SMS","WhatsApp","RCS","Mobile Push","In app notification","Web Push","Web Notifications"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Audience Bridge Report",
+                    status: "available",
+                    description: "Audience Bridge based data sync statistics.",
+                    capabilities: ["audience bridge","audiece push","Facebook","Meta","Google","MFT","SFTP","S3","Blob","Criteo","Klaviyo"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Customer Profile Dashboard",
+                    status: "available",
+                    description: "Comprehensive view of a unique customer profile view.",
+                    capabilities: ["FHID","CPD","Unique Customer View","Golden Record","Single View of Customer","SVOC","Customer 360"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Opt Out Dashboard",
+                    status: "available",
+                    description: "Report showing the list of customers who have unsubscribed from email campaigns along with the campaign that triggered the action.",
+                    capabilities: ["Email","unsubscription"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Campaign Summary Reports",
+                    status: "available",
+                    description: "Summary of performance of single channel, named campaigns executed.",
+                    capabilities: ["Single Channel","Email","SMS","WhatsApp","RCS"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Social Media Insights",
+                    status: "available",
+                    description: "Page/ Social Handle high level engagement metrics.",
+                    capabilities: ["Facebook Brand Page","Twitter","X","Meta"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Activity Feed",
+                    status: "available",
+                    description: "Logs to validate the communication sent to a unique contact vector.",
+                    capabilities: ["Email","SMS","WhatsApp"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Account Usage Summary",
+                    status: "available",
+                    description: "Summary of License, consumables, usage, et al for an account.",
+                    capabilities: ["Events","Consumables balances","usage","events usage summary"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Site & Mobile Analytics",
+                    status: "available",
+                    description: "Detailed behavioral analytics across website and mobile apps integrated with FirstHive",
+                    capabilities: ["web tracking","mobile tracking","customer behavior","anonymous visitors","events","dimensions"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Visitor Log",
+                    status: "available",
+                    description: "Visitor level view of site/ app visit ",
+                    capabilities: ["visitor log","anonymous visitor","repeat visitor","PII capture","first-party cookie","consent"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Real-time View",
+                    status: "available",
+                    description: "Real-time view of activity on your web or mobile properties.",
+                    capabilities: ["real time","geography coverage","events"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Pages",
+                    status: "available",
+                    description: "Page level engagement and performance view.",
+                    capabilities: ["pages","entry pages","exit pages","page transitions"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Events",
+                    status: "available",
+                    description: "Actions done on web or mobile properties, captured in a Category > Action > Name framework.",
+                    capabilities: ["events","dimensions","properties","Event category","Event Action","Event Name"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Transitions",
+                    status: "available",
+                    description: "Analytics showing the page level transitions on your website/ app.",
+                    capabilities: ["transitions","page visits"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Performance",
+                    status: "available",
+                    description: "Performance metrics for key pages.",
+                    capabilities: ["page performance"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "User Flows",
+                    status: "available",
+                    description: "Ability to visualize the visitor flows across pages.",
+                    capabilities: ["user flow","visitor flow","page titles","page URLs"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Acquisition Channels",
+                    status: "available",
+                    description: "Reporting on acqusition of visitors/ users.",
+                    capabilities: ["Acquisition channels","Direct","Campaigns","Referrers","Search"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Campaigns Acquisition",
+                    status: "available",
+                    description: "Acquisition of visitors via campaigns.",
+                    capabilities: ["UTM tags","Campaign Name","Source","Medium","Keywords"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Goals",
+                    status: "available",
+                    description: "Ability to define goals to track conversions.",
+                    capabilities: ["events","page visits"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Attribution",
+                    status: "available",
+                    description: "Ability to deploy multiple attribution models on assigned goals to determine impact on conversion.",
+                    capabilities: ["last touch","first touch","position based decay","linear","single touch attribution","multi-touch attribution"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Funnels",
+                    status: "config",
+                    description: "Ability to build a funnel view basis a page or an event to determine critical paths and drop offs.",
+                    capabilities: ["funnel","web","mobile","page visit","event based"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Heat Maps",
+                    status: "custom",
+                    description: "Heat Maps showing the visitor/ user behavior on your mobile/ web asset.",
+                    capabilities: ["user behavior","visitor behavior","heat map"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "IP to Location mapping",
+                    status: "available",
+                    description: "Ability to view visitor location city basis IP address captured.",
+                    capabilities: ["IP to location","visitor mapping"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "E-Commerce mapping",
+                    status: "config",
+                    description: "Ability to tag and create standard e-commerce events for view into the key business metrics.",
+                    capabilities: ["e-com","transactions capture","visits to conversion","SKU level mapping"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Configurable site/ mobile analytics dashboard",
+                    status: "available",
+                    description: "Ability to configure the default views or add/ remove widgets on the web/ mobile analytics dashboard.",
+                    capabilities: ["DIY dashboard","web analytics","mobile analytics","configured view","widgets"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "Configurable Report/ Dashboard Builder",
+                    status: "custom",
+                    description: "Ability to build DIY reports or dashboards beyond what is enabled in the FirstHive UI.",
+                    capabilities: ["PowerBI","Superset","Data Canvas","Python","S3","Replica"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Segment Visualization",
+                    status: "available",
+                    description: "Ability to view the key segment level metrics in terms of reachability and preferences.",
+                    capabilities: ["segment visualization"],
+                    releaseInfo: "Generally Available"
+                },
+                {
+                    name: "FH Insights",
+                    status: "custom",
+                    description: "Detailed Analytics around key metrics in the account.",
+                    capabilities: ["Unification Waterfall","Models behavior","Custom metrics"],
+                    releaseInfo: "Custom Config"
+                },
+                {
+                    name: "Campaign Alerts",
+                    status: "custom",
+                    description: "Alerts on key actions pertaining to a campaign or journey.",
+                    capabilities: ["campaign alerts","automation alerts"],
+                    releaseInfo: "Custom Config"
+                }
+
+
+                
+            ]
+        };
+
+        function initializeMatrix() {
+            const container = document.getElementById('categoriesContainer');
+            let totalAvailable = 0, totalBeta = 0, totalRoadmap = 0, totalCustom = 0, totalNA = 0;
+
+            Object.entries(featureData).forEach(([categoryName, features]) => {
+                const categoryStats = {
+                    available: features.filter(f => f.status === 'available').length,
+                    beta: features.filter(f => f.status === 'beta').length,
+                    roadmap: features.filter(f => f.status === 'roadmap').length,
+                    custom: features.filter(f => f.status === 'custom').length,
+                    na: features.filter(f => f.status === 'na').length
+                };
+
+                totalAvailable += categoryStats.available;
+                totalBeta += categoryStats.beta;
+                totalRoadmap += categoryStats.roadmap;
+                totalCustom += categoryStats.custom;
+                totalNA += categoryStats.na;
+
+                const categoryElement = createCategoryElement(categoryName, features, categoryStats);
+                container.appendChild(categoryElement);
+            });
+
+            // Update summary stats
+            document.getElementById('availableCount').textContent = totalAvailable;
+            document.getElementById('betaCount').textContent = totalBeta;
+            document.getElementById('roadmapCount').textContent = totalRoadmap;
+            document.getElementById('customCount').textContent = totalCustom;
+            document.getElementById('naCount').textContent = totalNA;
+        }
+
+        function createCategoryElement(categoryName, features, stats) {
+            const section = document.createElement('div');
+            section.className = 'category-section';
+            
+            section.innerHTML = `
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <div>
+                        <div class="category-title">${categoryName}</div>
+                        <div class="category-stats">
+                            <span style="color: #27ae60;">${stats.available} Available</span>
+                            <span style="color: #f39c12;">${stats.beta} Beta</span>
+                            <span style="color: #3498db;">${stats.roadmap} Roadmap</span>
+                            <span style="color: #d3d3d3;">${stats.custom} Custom Config</span>
+                        </div>
+                    </div>
+                    <div class="toggle-icon">▼</div>
+                </div>
+                <div class="category-content expanded">
+                    <div class="features-grid">
+                        ${features.map(feature => createFeatureCard(feature)).join('')}
+                    </div>
+                </div>
+            `;
+
+            return section;
+        }
+
+        function createFeatureCard(feature) {
+            return `
+                <div class="feature-card ${feature.status}" data-status="${feature.status}">
+                    <div class="feature-header">
+                        <div class="feature-name">${feature.name}</div>
+                        <div class="feature-status">
+                            <div class="status-indicator status-${feature.status}"></div>
+                            <span class="status-badge badge-${feature.status}">${getStatusLabel(feature.status)}</span>
+                        </div>
+                    </div>
+                    <div class="feature-description">${feature.description}</div>
+                    <div class="feature-details">
+                        <div class="feature-capabilities">
+                            ${feature.capabilities.map(cap => `<span class="capability-tag">${cap}</span>`).join('')}
+                        </div>
+                        <div class="release-info">${feature.releaseInfo}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'available': 'Available',
+                'beta': 'Beta',
+                'roadmap': 'Roadmap',
+                'na': 'N/A'
+            };
+            return labels[status] || status;
+        }
+
+        function toggleCategory(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            
+            content.classList.toggle('expanded');
+            icon.style.transform = content.classList.contains('expanded') ? 'rotate(0deg)' : 'rotate(-90deg)';
+        }
+
+        // Filter functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMatrix();
+
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const filter = this.dataset.filter;
+                    filterFeatures(filter);
+                });
+            });
+
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                searchFeatures(searchTerm);
+            });
+        });
+
+        function filterFeatures(status) {
+            document.querySelectorAll('.feature-card').forEach(card => {
+                if (status === 'all' || card.dataset.status === status) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function searchFeatures(term) {
+            document.querySelectorAll('.feature-card').forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(term)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
