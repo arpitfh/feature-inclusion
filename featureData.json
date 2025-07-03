@@ -466,7 +466,7 @@
           "name": "Whatsapp Campaign",
           "status": "available",
           "description": "Ability to create and execute personalized Whatsapp campaigns.",
-          "capabilities": ["Whatsapp"]
+          "capabilities": ["Whatsapp", "Plain Text","Rich-card", "Carousel", "Interactive Buttons (CTAs & Quick Reply)"]
       },
       {
           "name": "Whatsapp Integrations",
@@ -576,6 +576,12 @@
           "description": "Ability to schedule Audience sync with any destination at a pre configured frequency.",
           "capabilities": ["scheduler", "Audience bridge"]
       },
+      {
+        "name": "Audience Bridge Batching",
+        "status": "roadmap",
+        "description": "Ability to break up the audience being synced into smaller batches for consumption by the node system.",
+        "capabilities": ["scheduler", "Audience bridge","batches"]
+    },
       {
           "name": "Social Post Scheduler",
           "status": "available",
@@ -750,7 +756,7 @@
         "name": "Campaign Summary Reports",
         "status": "available",
         "description": "Summary of performance of single channel, named campaigns executed.",
-        "capabilities": ["Single Channel", "Email", "SMS", "WhatsApp", "RCS"]
+        "capabilities": ["Single Channel", "Email", "SMS", "WhatsApp"]
     },
     {
         "name": "Social Media Insights",
